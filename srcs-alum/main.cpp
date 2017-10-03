@@ -189,6 +189,72 @@ void DibujarObjetos()
    }
 }
 
+// ---------------------------------------------------------------------
+// verifica si hay errores al compilar el programa
+
+void VerErroresCompilar(GLuint idShader){
+  using namespace std;
+  const GLsizei maxt = 1024L*10L;
+  GLsizei tam;
+  GLchar buffer[maxt];
+  GLint ok;
+
+  glGetShaderiv(idShader, GL_COMPILE_STATUS, &ok); // ver si hay errores
+  if (ok == GL_TRUE) // si la compilación ha sido correcta
+    return; // no hacer nada
+
+  glGetShaderInfoLog(idShader, maxt, &tam, buffer); // leer log de errores
+  cout << "error al compilar:" << endl
+       << buffer << flush
+       << "programa abortado" << endl << flush;
+  exit(1); // abortar
+}
+
+// ---------------------------------------------------------------------
+// verifica si hay errores al enlazar el programa
+
+void VerErroresEnlazar(GLuint idProg){
+  using namespace std;
+  const GLsizei maxt = 1024L*10L;
+  GLsizei tam;
+  GLchar buffer[maxt];
+  GLint ok;
+
+  glGetProgramiv(idProg, GL_LINK_STATUS, &ok); // ver si hay errores
+  if (ok == GL_TRUE) // si el enlazado ha sido correcto
+    return; // no hacer nada
+
+  glGetProgramInfoLog(idProg, maxt, &tam, buffer); // leer log de errores
+  cout << "error al enlazar:" << endl
+       << buffer << flush
+       << "programa abortado" << endl << flush;
+  exit(1); // abortar
+}
+
+// ---------------------------------------------------------------------
+// permite leer un archivo
+
+char* LeerArchivo(const char* nombreArchivo){
+  // intenta abrir stream, si no se puede informar y abortar
+  ifstream file(nombreArchivo, ios::in|ios::binary|ios::ate);
+  if (!file.is_open()){
+    std::cout << "imposible abrir archivo para lectura ("
+              << nombreArchivo << ")" << std::endl;
+    exit(1);
+  }
+  // reservar memoria para guardar archivo completo
+  size_t numBytes = file.tellg(); // leer tamaño total de bytes
+  char* bytes = new char[numBytes+1]; //reservar memoria dinámica
+
+  // leer bytes:
+  file.seekg(0,ios::beg); // posicionar lectura al inicio
+  file.read(bytes, numBytes); //leer el archivo completo
+  file.close(); // cerrar stream de lectura
+  bytes[numBytes] = 0; // añadir 0 al final
+
+  // devolver puntero al primer elemento
+  return bytes;
+}
 
 // *********************************************************************
 // **
